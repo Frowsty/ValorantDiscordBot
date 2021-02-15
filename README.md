@@ -7,7 +7,7 @@ Current commands:
 (prefix is ",")
 ## Mod commands 
 restartBot - Will issue a restart on the bot which causes it to reload the python script thus applying any update that was uploaded to the server<br/>
-pauseBot   - As the name suggests it pauses the bot from listening to any commands (other than mod allowed commands such as restart, pause, resume)<br/>
+pauseBot   - Will pause the bot from listening to any commands (other than mod allowed commands such as restart, pause, resume)<br/>
 resumeBot  - Will resume the bot if bot is in a paused state
 
 ## User commands
