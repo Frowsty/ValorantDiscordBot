@@ -1,6 +1,8 @@
 # ValorantDiscordBot
 A quite barebone bot that will automatically verify users rank (Created specifically for Valorant Curios discord server)
 
+The bot is making use of @dylantheriot ValorantAPI with an update from me to make it work with the latest update of valorants api.
+
 Current commands:
 (prefix is ",")
 ## Mod commands 
