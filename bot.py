@@ -50,10 +50,10 @@ def addModsToAdminList():
             if "moderator" in currentRoles or "admin" in currentRoles:
                 botAdmins.append(member.id)
 
-def findHighestRank(data):
+def findRankInMatchHistory(data):
     rank = 0
     for match in data["Matches"]:
-        if match["TierAfterUpdate"] > rank:
+        if match["TierAfterUpdate"] > 0 and rank == 0:
             rank = match["TierAfterUpdate"]
     return rank
 
@@ -61,7 +61,7 @@ def saveDataToServer(message, guild, data, gamename):
     if not os.path.exists(os.path.join(curPath, "servers", str(guild))):
         os.mkdir(os.path.join(curPath, "servers", str(guild)))
     with open(os.path.join(curPath, "servers", str(guild), str(message.author.id) + ".txt"), "w+") as f:
-        f.write(gamename + "\n" + str(findHighestRank(data)))
+        f.write(gamename + "\n" + str(findRankInMatchHistory(data)))
 
 def removeUserFromDict(d, key):
     r = dict(d)
@@ -202,6 +202,7 @@ async def on_message(message):
                             role = discord.utils.get(member.guild.roles, name="Immortal Episode2")
                         elif "Radiant" in rankName:
                             role = discord.utils.get(member.guild.roles, name="Radiant")
+
                         if role:
                             assignedRole = role.name
                             currentRoles = [role.name for role in member.roles]
@@ -244,10 +245,10 @@ async def on_message(message):
                                     await message.author.send("You were assigned the {} role (Close DMs from this bot or delete messages containing your password to avoid someone seeing it)".format(rankName))
                             print(f"{message.author} ({message.author.id}) has succcessfully finished the rank proof process and was assigned a role")
                         else:
-                            replyMessage = '<@{}>'.format(message.author.id) + "```Something went wrong during, please restart the whole rank proof process including registering account```"
+                            replyMessage = '<@{}>'.format(message.author.id) + f"```{assignedRole}```"
                             print(f"{message.author} ({message.author.id}) experienced a problem during the rank proof process")
                 except FileNotFoundError: 
-                    replyMessage = '<@{}>'.format(message.author.id) + '```***Error***\nRanked data not found, make sure the account is registered by using .registerAccount```'
+                    replyMessage = '<@{}>'.format(message.author.id) + '```***Error***\nRanked data not found, make sure the account is registered by using ,registerAccount```'
             await message.channel.send(replyMessage)
 
 botToken = None
