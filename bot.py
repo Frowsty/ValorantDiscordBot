@@ -26,9 +26,9 @@ startTime = time.time()
 
 curPath = os.path.dirname(sys.argv[0])
 
-if not os.path.exists(os.path.join(os.path.dirname(sys.argv[0]), "servers")):
+if not os.path.exists(os.path.join(curPath, "servers")):
     print("There is no directory called servers")
-    os.mkdir(os.path.join(os.path.dirname(sys.argv[0]), "servers"))
+    os.mkdir(os.path.join(curPath, "servers"))
 
 if os.path.exists("restartBot.txt"):
     with open("restartBot.txt", 'r') as f:
@@ -197,11 +197,11 @@ async def on_message(message):
                         role = None
                         assignedRole = "User is not above Diamond, please assign your role manually in the #rank-assign channel"
                         if "Diamond" in rankName:
-                            role = discord.utils.get(member.guild.roles, name="Diamond")
+                            role = discord.utils.get(member.guild.roles, name="Diamond Episode2")
                         elif "Immortal" in rankName:
                             role = discord.utils.get(member.guild.roles, name="Immortal Episode2")
                         elif "Radiant" in rankName:
-                            role = discord.utils.get(member.guild.roles, name="Radiant")
+                            role = discord.utils.get(member.guild.roles, name="Radiant Episode2")
 
                         if role:
                             assignedRole = role.name
@@ -211,27 +211,27 @@ async def on_message(message):
                                 replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of DiscordID {}***\n{} is: {} \n\nUser was assigned {} role```".format(userID, gameName, rankName, assignedRole)
                             else:
                                 replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of DiscordID {}***\n{} is: {} \n\nUser already has correct role assigned```".format(userID, gameName, rankName)
-                            if assignedRole == "Radiant" and "Diamond" in currentRoles:
-                                removeRole = discord.utils.get(member.guild.roles, name="Diamond")
+                            if assignedRole == "Radiant Episode2" and "Diamond Episode2" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Diamond Episode2")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Radiant" and "Immortal" in currentRoles:
-                                removeRole = discord.utils.get(member.guild.roles, name="Immortal")
+                            if assignedRole == "Radiant Episode2" and "Immortal Episode2" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Immortal Episode2")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Immortal Episode2" and "Diamond" in currentRoles:
-                                removeRole = discord.utils.get(member.guild.roles, name="Diamond")
+                            if assignedRole == "Immortal Episode2" and "Diamond Episode2" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Diamond Episode2")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Diamond" and "Platinum" in currentRoles:
+                            if assignedRole == "Diamond Episode2" and "Platinum" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Platinum")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Immortal" and "Platinum" in currentRoles:
+                            if assignedRole == "Immortal Episode2" and "Platinum" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Platinum")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Radiant" and "Platinum" in currentRoles:
+                            if assignedRole == "Radiant Episode2" and "Platinum" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Platinum")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
