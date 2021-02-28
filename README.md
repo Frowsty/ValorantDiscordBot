@@ -1,11 +1,13 @@
 # ValorantDiscordBot
 A quite barebone bot that will automatically verify users rank (Created specifically for Valorant Curios discord server)
 
+The bot is making use of @dylantheriot ValorantAPI with an update from me to make it work with the latest update of valorants api.
+
 Current commands:
 (prefix is ",")
 ## Mod commands 
 restartBot - Will issue a restart on the bot which causes it to reload the python script thus applying any update that was uploaded to the server<br/>
-pauseBot   - As the name suggests it pauses the bot from listening to any commands (other than mod allowed commands such as restart, pause, resume)<br/>
+pauseBot   - Will pause the bot from listening to any commands (other than mod allowed commands such as restart, pause, resume)<br/>
 resumeBot  - Will resume the bot if bot is in a paused state
 
 ## User commands
