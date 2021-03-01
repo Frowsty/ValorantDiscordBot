@@ -133,7 +133,7 @@ async def on_message(message):
         print(f"{message.author} has executed a restart!")
         await message.channel.send("Please wait a moment as I restart! Be right back!")
         os.execv(sys.executable, ['python3'] + sys.argv)
-    elif message.content.startswith('.restartBot'):
+    elif message.content.startswith(',restartBot'):
         await message.channel.send("You lack permissions to execute a restart! Please provide the root password or become owner of the bot")
     # End of root access
 
@@ -197,11 +197,11 @@ async def on_message(message):
                         role = None
                         assignedRole = "User is not above Diamond, please assign your role manually in the #rank-assign channel"
                         if "Diamond" in rankName:
-                            role = discord.utils.get(member.guild.roles, name="Diamond Episode2")
+                            role = discord.utils.get(member.guild.roles, name="Diamond")
                         elif "Immortal" in rankName:
-                            role = discord.utils.get(member.guild.roles, name="Immortal Episode2")
+                            role = discord.utils.get(member.guild.roles, name="Immortal")
                         elif "Radiant" in rankName:
-                            role = discord.utils.get(member.guild.roles, name="Radiant Episode2")
+                            role = discord.utils.get(member.guild.roles, name="Radiant")
 
                         if role:
                             assignedRole = role.name
@@ -211,37 +211,44 @@ async def on_message(message):
                                 replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of DiscordID {}***\n{} is: {} \n\nUser was assigned {} role```".format(userID, gameName, rankName, assignedRole)
                             else:
                                 replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of DiscordID {}***\n{} is: {} \n\nUser already has correct role assigned```".format(userID, gameName, rankName)
-                            if assignedRole == "Radiant Episode2" and "Diamond Episode2" in currentRoles:
-                                removeRole = discord.utils.get(member.guild.roles, name="Diamond Episode2")
+                            if assignedRole == "Radiant" and "Diamond" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Diamond")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Radiant Episode2" and "Immortal Episode2" in currentRoles:
-                                removeRole = discord.utils.get(member.guild.roles, name="Immortal Episode2")
+                            if assignedRole == "Radiant" and "Immortal" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Immortal")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Immortal Episode2" and "Diamond Episode2" in currentRoles:
-                                removeRole = discord.utils.get(member.guild.roles, name="Diamond Episode2")
+                            if assignedRole == "Immortal" and "Radiant" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Radiant")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Diamond Episode2" and "Platinum" in currentRoles:
+                            if assignedRole == "Immortal" and "Diamond" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Diamond")
+                                if removeRole:
+                                    await member.remove_roles(removeRole)
+                            if assignedRole == "Diamond" and "Platinum" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Platinum")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Immortal Episode2" and "Platinum" in currentRoles:
+                            if assignedRole == "Immortal" and "Platinum" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Platinum")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                            if assignedRole == "Radiant Episode2" and "Platinum" in currentRoles:
+                            if assignedRole == "Radiant" and "Platinum" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Platinum")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
+                           
+                            # Assign a verified role to the user
+                            verifyRole = discord.utils.get(member.guild.roles, name="Verified EP2")
+                            if verifyRole:
+                                await member.add_roles(verifyRole)
+
                             if "Proof request" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Proof request")
                                 if removeRole:
                                     await member.remove_roles(removeRole)
-                                    verifyRole = discord.utils.get(member.guild.roles, name="Verified")
-                                    if verifyRole:
-                                        await member.add_roles(verifyRole)
                                     await message.author.send("You were assigned the {} role (Close DMs from this bot or delete messages containing your password to avoid someone seeing it)".format(rankName))
                             print(f"{message.author} ({message.author.id}) has succcessfully finished the rank proof process and was assigned a role")
                         else:
