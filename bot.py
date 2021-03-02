@@ -60,8 +60,21 @@ def findRankInMatchHistory(data):
 def saveDataToServer(message, guild, data, gamename):
     if not os.path.exists(os.path.join(curPath, "servers", str(guild))):
         os.mkdir(os.path.join(curPath, "servers", str(guild)))
-    with open(os.path.join(curPath, "servers", str(guild), str(message.author.id) + ".txt"), "w+") as f:
-        f.write(gamename + "\n" + str(findRankInMatchHistory(data)))
+    jsonData = {}
+    with open(os.path.join(curPath, "servers", str(guild), "UserData.json"), "r") as f:
+        try:
+            jsonData = json.load(f)
+        except:
+            print("JSON failed to load, file is most likely missing!")
+
+    with open(os.path.join(curPath, "servers", str(guild), "UserData.json"), "w") as f:
+        if str(message.author.id) in jsonData:
+            jsonData[str(message.author.id)]["gameName"] = gamename
+            jsonData[str(message.author.id)]["rankID"] = str(findRankInMatchHistory(data))
+        else:
+            jsonData[str(message.author.id)] = {"gameName": gamename, "rankID": str(findRankInMatchHistory(data))}
+
+        json.dump(jsonData, f, indent=4)
 
 def removeUserFromDict(d, key):
     r = dict(d)
@@ -145,7 +158,7 @@ async def on_message(message):
         if message.content.startswith(',help'):
             replyMessage = '<@{}>'.format(message.author.id)
             replyMessage = replyMessage + "```***Help / Commands***\n"
-            replyMessage = replyMessage + ",registerAccount - Will take you through a login sequence through DMs (required step in order to run .assignRole command)\n"
+            replyMessage = replyMessage + ",registerAccount - Will take you through a login sequence through DMs (required step in order to run ,assignRole command)\n"
             replyMessage = replyMessage + ",assignRole      - Will assign the role depending on the your rank in valorant (only diamond or above)```"
             print("{0} executed help command".format(message.author))
             await message.channel.send(replyMessage)
@@ -172,7 +185,7 @@ async def on_message(message):
                     await message.author.send("Your ranked data has been saved and all login information has been cleared (Close DMs from this bot or delete messages containing your password to avoid someone seeing it)")
                 else:
                     usersBeingVerified = removeUserFromDict(usersBeingVerified, message.author.id)
-                    await message.author.send("Login error has occured, make sure everything was entered correctly and restart the sign in process by executing the .registerAccount command in the server again!")
+                    await message.author.send("Login error has occured, make sure everything was entered correctly and restart the sign in process by executing the ,registerAccount command in the server again!")
 
         if message.content.startswith(",registerAccount"):
             if not message.author.id in usersBeingVerified:
@@ -188,13 +201,15 @@ async def on_message(message):
             member = message.guild.get_member(int(userID))
             if os.path.exists(os.path.join(curPath, "servers", str(message.guild.id))):
                 try:
-                    with open(os.path.join(curPath, "servers", str(message.guild.id), str(userID) + ".txt"), "r") as f:
-                        gameName = f.readline().split("\n")[0]
-                        rankNumber = f.readline()
+                    with open(os.path.join(curPath, "servers", str(message.guild.id), "UserData.json"), "r") as f:
+                        jsonData = json.load(f)
+                        gameName = jsonData[str(userID)]["gameName"]
+                        rankNumber = jsonData[str(userID)]["rankID"]
                         rankList = requests.get("https://502.wtf/ValorrankInfo.json")
                         rankList = rankList.json()
                         rankName = rankList["Ranks"][str(rankNumber)]
                         role = None
+                        currentRoles = [role.name for role in member.roles]
                         assignedRole = "User is not above Diamond, please assign your role manually in the #rank-assign channel"
                         if "Diamond" in rankName:
                             role = discord.utils.get(member.guild.roles, name="Diamond")
@@ -205,12 +220,11 @@ async def on_message(message):
 
                         if role:
                             assignedRole = role.name
-                            currentRoles = [role.name for role in member.roles]
                             if not assignedRole in currentRoles:
                                 await member.add_roles(role)
-                                replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of DiscordID {}***\n{} is: {} \n\nUser was assigned {} role```".format(userID, gameName, rankName, assignedRole)
+                                replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of Discord User {} (ID: {})***\nGame name: {}\nPlayer rank: {} \n\nUser was assigned the {} role```".format(message.author, userID, gameName, rankName, assignedRole)
                             else:
-                                replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of DiscordID {}***\n{} is: {} \n\nUser already has correct role assigned```".format(userID, gameName, rankName)
+                                replyMessage = '<@{}>'.format(message.author.id) + "```***Rank of Discord User {} (ID: {})***\nGame name: {}\nPlayer rank: {} \n\nUser already has correct role assigned```".format(message.author, userID, gameName, rankName)
                             if assignedRole == "Radiant" and "Diamond" in currentRoles:
                                 removeRole = discord.utils.get(member.guild.roles, name="Diamond")
                                 if removeRole:
@@ -252,9 +266,17 @@ async def on_message(message):
                                     await message.author.send("You were assigned the {} role (Close DMs from this bot or delete messages containing your password to avoid someone seeing it)".format(rankName))
                             print(f"{message.author} ({message.author.id}) has succcessfully finished the rank proof process and was assigned a role")
                         else:
+                            if "Proof request" in currentRoles:
+                                removeRole = discord.utils.get(member.guild.roles, name="Proof request")
+                                if removeRole:
+                                    await member.remove_roles(removeRole)
+                                    await message.author.send("Only Diamond or above is eligible for rank-proof (Close DMs from this bot or delete messages containing your password to avoid someone seeing it)".format(rankName))
+
                             replyMessage = '<@{}>'.format(message.author.id) + f"```{assignedRole}```"
-                            print(f"{message.author} ({message.author.id}) experienced a problem during the rank proof process")
+                            print(f"{message.author} ({message.author.id}) Not eligible for rank-proof, user was denied!")
                 except FileNotFoundError: 
+                    replyMessage = '<@{}>'.format(message.author.id) + '```***Error***\nRanked data not found, make sure the account is registered by using ,registerAccount```'
+                except KeyError:
                     replyMessage = '<@{}>'.format(message.author.id) + '```***Error***\nRanked data not found, make sure the account is registered by using ,registerAccount```'
             await message.channel.send(replyMessage)
 
